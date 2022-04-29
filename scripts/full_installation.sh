@@ -10,7 +10,7 @@
 # ./full_installation.sh
 
 ./prometheus.sh
-./node.sh
+./nodeexporter.sh
 ./blackbox.sh
 ./alertmanager.sh
 ./grafana.sh
