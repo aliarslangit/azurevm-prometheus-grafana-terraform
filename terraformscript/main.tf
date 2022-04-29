@@ -61,12 +61,13 @@ resource "azurerm_virtual_machine" "main" {
     caching           = "ReadWrite"
     create_option     = "FromImage"
     managed_disk_type = "Standard_LRS"
-    custom_data       = file("C:/Users/ali.arslan/Desktop/GIT/prometheus git/azurevm-prometheus-terraform/scripts/full_installation.sh")
+
   }
   os_profile {
     computer_name  = "hostname"
     admin_username = var.adminuser
     admin_password = var.adminpassword
+    custom_data    = file("C:/Users/ali.arslan/Desktop/GIT/prometheus git/azurevm-prometheus-terraform/scripts/full_installation.sh")
   }
   os_profile_linux_config {
     disable_password_authentication = false
