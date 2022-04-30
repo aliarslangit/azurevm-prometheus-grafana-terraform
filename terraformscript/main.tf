@@ -67,7 +67,7 @@ resource "azurerm_virtual_machine" "main" {
     computer_name  = "hostname"
     admin_username = var.adminuser
     admin_password = var.adminpassword
-
+    custom_data    = file("../scripts/prometheus.sh")
   }
   os_profile_linux_config {
     disable_password_authentication = false
