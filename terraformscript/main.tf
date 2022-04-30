@@ -73,8 +73,8 @@ resource "azurerm_virtual_machine" "main" {
     disable_password_authentication = false
   }
   provisioner "file" {
-    source      = "./install_apache.sh"
-    destination = "./install_apache.sh"
+    source      = "../scripts/prometheus.sh"
+    destination = "./prometheus.sh"
 
     connection {
       type     = "ssh"
@@ -85,8 +85,7 @@ resource "azurerm_virtual_machine" "main" {
   }
   provisioner "remote-exec" {
     inline = [
-      "chmod +x ./install_apache.sh",
-      "./install_apache.sh args",
+      "chmod +x ./prometheus.sh",
     ]
     connection {
       type     = "ssh"
