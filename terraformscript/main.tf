@@ -67,10 +67,33 @@ resource "azurerm_virtual_machine" "main" {
     computer_name  = "hostname"
     admin_username = var.adminuser
     admin_password = var.adminpassword
-    custom_data    = file("C:/Users/ali.arslan/Desktop/GIT/prometheus git/azurevm-prometheus-terraform/scripts/full_installation.sh")
+
   }
   os_profile_linux_config {
     disable_password_authentication = false
+  }
+  provisioner "file" {
+    source      = "./install_apache.sh"
+    destination = "./install_apache.sh"
+
+    connection {
+      type     = "ssh"
+      user     = var.adminuser
+      password = var.adminpassword
+      host     = azurerm_public_ip.cmp.ip_address
+    }
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x ./install_apache.sh",
+      "./install_apache.sh args",
+    ]
+    connection {
+      type     = "ssh"
+      user     = var.adminuser
+      password = var.adminpassword
+      host     = azurerm_public_ip.cmp.ip_address
+    }
   }
   tags = {
     environment = var.environment
