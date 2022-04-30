@@ -80,7 +80,7 @@ resource "azurerm_virtual_machine" "main" {
       type     = "ssh"
       user     = var.adminuser
       password = var.adminpassword
-      host     = azurerm_public_ip.demo.ip_address
+      host     = azurerm_public_ip.main.ip_address
     }
   }
   provisioner "remote-exec" {
@@ -91,7 +91,7 @@ resource "azurerm_virtual_machine" "main" {
       type     = "ssh"
       user     = var.adminuser
       password = var.adminpassword
-      host     = azurerm_public_ip.demo.ip_address
+      host     = azurerm_public_ip.main.ip_address
     }
   }
   tags = {
