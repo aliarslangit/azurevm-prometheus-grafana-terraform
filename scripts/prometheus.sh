@@ -1,45 +1,100 @@
 #!/bin/bash
 
-# Make prometheus user
-sudo adduser --no-create-home --disabled-login --shell /bin/false --gecos "Prometheus Monitoring User" prometheus
+#Step 1: Create a new user Prometheus with the following command 
 
-# Make directories and dummy files necessary for prometheus
-sudo mkdir /etc/prometheus
-sudo mkdir /var/lib/prometheus
-sudo touch /etc/prometheus/prometheus.yml
-sudo touch /etc/prometheus/prometheus.rules.yml
+useradd --system --no-create-home --shell /usr/sbin/nologin prometheus 
 
-# Assign ownership of the files above to prometheus user
-sudo chown -R prometheus:prometheus /etc/prometheus
-sudo chown prometheus:prometheus /var/lib/prometheus
 
-# Download prometheus and copy utilities to where they should be in the filesystem
-#VERSION=2.2.1
-VERSION=$(curl https://raw.githubusercontent.com/prometheus/prometheus/master/VERSION)
-wget https://github.com/prometheus/prometheus/releases/download/v${VERSION}/prometheus-${VERSION}.linux-amd64.tar.gz
-tar xvzf prometheus-${VERSION}.linux-amd64.tar.gz
+#Step 2: Create a directory and change to the newly created directory using below commands 
 
-sudo cp prometheus-${VERSION}.linux-amd64/prometheus /usr/local/bin/
-sudo cp prometheus-${VERSION}.linux-amd64/promtool /usr/local/bin/
-sudo cp -r prometheus-${VERSION}.linux-amd64/consoles /etc/prometheus
-sudo cp -r prometheus-${VERSION}.linux-amd64/console_libraries /etc/prometheus
+mkdir /etc/prometheus 
+cd /etc/prometheus 
 
-# Assign the ownership of the tools above to prometheus user
-sudo chown -R prometheus:prometheus /etc/prometheus/consoles
-sudo chown -R prometheus:prometheus /etc/prometheus/console_libraries
-sudo chown prometheus:prometheus /usr/local/bin/prometheus
-sudo chown prometheus:prometheus /usr/local/bin/promtool
+#This directory is to store log files, data files, configuration files in single directory 
 
-# Populate configuration files
-cat ./prometheus/prometheus.yml | sudo tee /etc/prometheus/prometheus.yml
-cat ./prometheus/prometheus.rules.yml | sudo tee /etc/prometheus/prometheus.rules.yml
-cat ./prometheus/prometheus.service | sudo tee /etc/systemd/system/prometheus.service
+#Step 3: Download the latest version of Prometheus from the official website of Prometheus and install it on Ubuntu. 
 
-# systemd
-sudo systemctl daemon-reload
-sudo systemctl enable prometheus
-sudo systemctl start prometheus
+wget https://github.com/prometheus/prometheus/releases/download/v2.33.4/prometheus-2.33.4.linux-amd64.tar.gz 
 
-# Installation cleanup
-rm prometheus-${VERSION}.linux-amd64.tar.gz
-rm -rf prometheus-${VERSION}.linux-amd64
+#Step 4: Extract the tar.gz archive with the following command 
+
+tar xzf prometheus-2.32.1.linux-amd64.tar.gz 
+
+#Step 5: move the unziped files to /etc/Prometheus directory using the below commands. 
+
+Cd prometheus-2.33.4.linux-amd64 
+
+mv -v * /etc/prometheus 
+
+ 
+#Step 6: Change the user and group of all the files and directories of the /etc/prometheus/ directory to root. 
+
+chown -Rfv root:root /etc/prometheus 
+
+ 
+
+#Step 7: Fix the file and directory permissions of all the files and directories of the /etc/prometheus/ directory. 
+
+chmod -Rfv 0755 /etc/prometheus 
+
+ #Step 8: Prometheus needs a directory where it can store the metrics that it had collected. Create a new directory data/ in the /etc/prometheus/ directory as follows. 
+
+mkdir -v /etc/prometheus/data 
+
+ 
+
+#Step 9: Change the user and group of the /etc/prometheus/data/ directory to prometheus as follows. 
+
+chown -Rfv prometheus:prometheus /etc/prometheus/data 
+
+ 
+
+#Step 10: Create a systemd service file prometheus.service, run the following command. 
+
+vi /etc/systemd/system/prometheus.service 
+
+ [Unit] 
+
+Description=Monitoring system and time series database 
+
+ 
+
+[Service] 
+
+Restart=always 
+
+User=Prometheus 
+
+ 
+
+ExecStart=/etc/prometheus/Prometheus  --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/etc/prometheus/data 
+
+ 
+
+ExecReload=/bin/kill -HUP $MAINPID 
+
+TimeoutStopSec=20s 
+
+SendSIGKILL=no 
+
+LimitNOFILE=8192 
+
+ 
+
+[Install] 
+
+WantedBy=multi-user.target 
+
+ 
+
+#Step 11: For the systemd changes to take effect, run the following command. 
+
+systemctl daemon-reload 
+
+#Step 12: Start the prometheus service with the following command. 
+
+systemctl start prometheus.service 
+
+#Step 13: Add the prometheus service to the system startup, so that it automatically starts on boot with the following command. 
+
+systemctl enable prometheus.service 
