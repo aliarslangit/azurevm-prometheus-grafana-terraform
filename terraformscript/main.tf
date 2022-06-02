@@ -85,6 +85,7 @@ resource "azurerm_virtual_machine" "main" {
   }
   provisioner "remote-exec" {
     inline = [
+      "ls",
       "chmod +x ./prometheus.sh",
     ]
     connection {
